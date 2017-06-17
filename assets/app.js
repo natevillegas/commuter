@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 //Alexis' New Comment (Sat Class)
 
+=======
+// New comment from Alexis
+// hello hello
+>>>>>>> 6a3e027b4d642188b2c9994a8201f72bd4671afd
 // Pseudocode
 
 // The user is allowed to input text for Origin Form
@@ -96,12 +101,9 @@ $("#submitButton").on("click", function(){
 
 });
 
-// function for pushing firebase addresses to html
-database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-	// prevent default
-	console.log(childSnapshot.val());
-	// Store everything into a variable.
-	var streetOrigin = childSnapshot.val().streetOrigin;
+// print last 3 addresses from firebase to html
+database.ref().limitToLast(3).on('child_added', function(childSnapshot) {
+var streetOrigin = childSnapshot.val().streetOrigin;
 	var cityOrigin = childSnapshot.val().cityOrigin;
 	var stateOrigin = childSnapshot.val().stateOrigin;
 	var zipOrigin = childSnapshot.val().zipOrigin;
@@ -115,9 +117,33 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 	var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
 	
 	// Add addresses to the respective "Previous ____" div
-	$("#prevOrigins").append("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"</div></div>");
-	$("#prevDestinations").append("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"</div></div>");
+	$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this address</a></div></div>");
+	$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this address</a></div></div>");
 });
+
+// below commented function for pushing *ALL* firebase addresses to html
+// database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+// 	// prevent default
+// 	//console.log(childSnapshot.val());
+// 	// Store everything into a variable.
+// 	var streetOrigin = childSnapshot.val().streetOrigin;
+// 	var cityOrigin = childSnapshot.val().cityOrigin;
+// 	var stateOrigin = childSnapshot.val().stateOrigin;
+// 	var zipOrigin = childSnapshot.val().zipOrigin;
+
+// 	var streetDestination = childSnapshot.val().streetDestination;
+// 	var cityDestination = childSnapshot.val().cityDestination;
+// 	var stateDestination = childSnapshot.val().stateDestination;
+// 	var zipDestination = childSnapshot.val().zipDestination;
+
+// 	var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
+// 	var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
+	
+// 	// Add addresses to the respective "Previous ____" div
+// 	$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this address</a></div></div>");
+// 	$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this address</a></div></div>");
+
+// });
 
 // 3 functions below get user's location
 var queryURL = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ";
@@ -136,43 +162,71 @@ function showPosition(position) {
 			url:queryURL,
 			method:'GET'
 		}).done(function(response) {
-			console.log(response.results[0].address_components);
+			//console.log(response.results[0].address_components);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].long_name;
-			console.log(userCurrentStreet);
+			//console.log(userCurrentStreet);
 
 			var userCurrentCity = response.results[0].address_components[3].long_name;
-			console.log(userCurrentCity);
+			//console.log(userCurrentCity);
 
 			var userCurrentState = response.results[0].address_components[5].short_name;
-			console.log(userCurrentState);
+			//console.log(userCurrentState);
 
 			var userCurrentZIP = response.results[0].address_components[7].long_name;
-			console.log(userCurrentZIP);
+			//console.log(userCurrentZIP);
 
 			$("#originStreet-input").attr("value", userCurrentStreet);
 			$("#originCity-input").attr("value", userCurrentCity);
 			$("#originState-input").attr("value", userCurrentState);
 			$("#originZIP-input").attr("value", userCurrentZIP);
 
-
-
 		});
 }
 
-//BART API
-var userkeyBart = "MW9S-E7SL-26DU-VV8V";
-
-var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
-
-		$.ajax({
-			url: queryURL,
-			method: 'GET'
-			}).done(function(response){
-				console.log(queryURL);
-
-		});
-
 $("#userLocation").on("click", getLocation);
+
+// //BART API
+// var userkeyBart = "MW9S-E7SL-26DU-VV8V";
+
+// var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
+
+// 		$.ajax({
+// 			url: queryURL,
+// 			method: 'GET'
+// 			}).done(function(response){
+// 				//console.log(queryURL);
+
+// 		});
+
+$(document).on("click", ".useThisO", function(event){
+  // prevent default
+  event.preventDefault();
+  var prevStreetOrigin = $(this).attr("street");
+  var prevCityOrigin = $(this).attr("city");
+  var prevStateOrigin = $(this).attr("state");
+  var prevZipOrigin = $(this).attr("zip");
+  //console.log(prevStreetOrigin);
+
+  $("#originStreet-input").attr("value", prevStreetOrigin);
+  $("#originCity-input").attr("value", prevCityOrigin);
+  $("#originState-input").attr("value", prevStateOrigin);
+  $("#originZIP-input").attr("value", prevZipOrigin);
+});
+
+$(document).on("click", ".useThisD", function(event){
+  // prevent default
+  event.preventDefault();
+  var prevStreetDestination = $(this).attr("street");
+  var prevCityDestination = $(this).attr("city");
+  var prevStateDestination = $(this).attr("state");
+  var prevZipDestination = $(this).attr("zip");
+  //console.log(prevStreetOrigin);
+
+  $("#destinationStreet-input").attr("value", prevStreetDestination);
+  $("#destinationCity-input").attr("value", prevCityDestination);
+  $("#destinationState-input").attr("value", prevStateDestination);
+  $("#destinationZIP-input").attr("value", prevZipDestination);
+});
 
 // function to use
 // $("#useThisAddress").on("click", function(){
