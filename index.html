@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Comm&uuml;ter</title>
+
+	
+	<!--Call to jQuery-->
+	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+
+	<!--Calls to Firebase-->
+	<script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+	<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.1.1/firebaseui.css"/>
+		
+	<!--Call to Bootstrap with Bootswatch Layout-->
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cyborg/bootstrap.min.css" rel="stylesheet" integrity="sha384-D9XILkoivXN+bcvB2kSOowkIvIcBbNdoDQvfBNsxYAIieZbx8/SI4NeUvrRGCpDi" crossorigin="anonymous">
+
+	<!--Call to googlemaps api-->
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ" async defer></script>
+
+</head>
+
+<body>
+	<!--Wrap Page in Container to create equal margins-->
+	<div class="container">
+		
+		<!--Figure out how to show current user on top-right of page-->
+		<div align="right" id="userID">Signed in as: Placeholder
+		</div>
+		
+		<!--Page Header Div-->
+		<div class="jumbotron" id="page-header">
+			<h1 align="center">Commuter</h1><br>
+			<h3 align="center">Find the most time or cost-efficient way to get to your destination</h3>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="panel panel-default">
+					<div class="panel-heading"><h5>Origin</h5></div><br>
+					
+					<div class="panel-body">
+						<div class="input-group">
+							<input id="originStreet-input" type="text" placeholder="Street Address"><br>
+							<input id="originCity-input" type="text" placeholder="City">
+							<input id="originState-input" type="text" placeholder="State">
+							<input id="originZIP-input" type="text" placeholder="ZIP Code">
+						</div>
+						<br>
+						<br>
+
+					<!--Figure out how clicking the link will take in the User's location and put fill in the origin field-->
+					<a href="#" id="userLocation">Use Current Location</a>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-md-6">
+				<div class="panel panel-default">
+					<div class="panel-heading"><h5>Destination</h5></div><br>
+					
+					<div class="panel-body">
+						<div class="input-group">
+							<input id="destinationStreet-input" type="text" placeholder="Street Address"><br>
+							<input id="destinationCity-input" type="text" placeholder="City">
+							<input id="destinationState-input" type="text" placeholder="State">
+							<input id="destinationZIP-input" type="text" placeholder="ZIP Code">
+						</div>
+					
+						<br>
+						<!--Give button functionality to push all input values onto Firebase, hide prevOrigins & prevDestinations, 
+						and show fastestOption & cheapestOption-->
+						<button class="btn btn-default" type="submit" id="submitButton">Submit</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!--Hidden until Submit is clicked-->
+		<div class="row">
+			<div class="col-md-6" id="prevOrigins">
+				<h5>Previous Origins</h5><br>
+			</div>
+
+			<div class="col-md-6" id="prevDestinations">
+				<h5>Previous Destinations</h5><br>
+			</div>
+		</div>
+		
+		<!--Append to fastestOption and cheapestOption
+			"Uber" or "BART"
+			The Time for the Trip and the Price for Each
+			The Option to open the appropriate Uber, BART, or Maps app-->
+		<div class="row">
+			<div class="col-md-6">
+				<div id="fastestOption">
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div id="cheapestOption">
+				</div>
+			</div>
+		</div>
+	</div>
+
+  <!-- JavaScript -->
+  <script src="assets/app.js"></script>
+</body>
+</html>
