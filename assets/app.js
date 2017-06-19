@@ -53,15 +53,9 @@ firebase.initializeApp(config);
 // variable
 var database = firebase.database()
 
-// Commented out these variables since we use them in different ways in the functions below
-// var streetOrigin = "";
-// var cityOrigin = "";
-// var stateOrigin = "";
-// var zipOrigin;
-// var streetDestination = "";
-// var cityDestination = "";
-// var stateDestination = "";
-// var zipDestination;
+// uber keys
+var uberClientId = "W5EjuGPtsBB6ys1CsU4yO_v2v6OD-9yv";
+var uberServerToken = "JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT";
 
 //function for getting user address inputs and storing to firebase
 $("#submitButton").on("click", function(){
@@ -88,55 +82,67 @@ $("#submitButton").on("click", function(){
 		stateDestination: stateDestination,
 		zipDestination: zipDestination,
 	};
-	//push objects to firebase database
+	// push objects to firebase database
   	database.ref().push(navInfo);
   	
+  	// clear span
+  	$("#prevOrigins").empty();
+  	$("#prevDestinations").empty();
+  	// re-print last 3 addresses from firembase to html
+  	printPreviousAddresses();
+
+	//****************** UBER STUFF **********************
+	// // ***THESE ARE TEST VALUES****
+	// var userLatitude = 41.7283405
+	//   , userLongitude = -72.994567
+	//   , partyLatitude = 40.7283405
+ 	//   , partyLongitude = -73.994567;
+
+	// getEstimatesForUserLocation(userLatitude, userLongitude);
+
+	// function getEstimatesForUserLocation(latitude,longitude) {
+	// 	$.ajax({
+	//     	url: "https://api.uber.com/v1/estimates/price?start_latitude=" + latitude + "&start_longitude=" + longitude + "&end_latitude=" + partyLatitude + "&end_longitude=" + partyLongitude + "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
+	// 		method: "GET"
+	// 	}).done(function(response) {
+	// 		console.log(response.prices[0].high_estimate);
+	// 		$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[7].high_estimate + "</p>");
+	// 	});
+	// }
+	//****************** ^^ UBER STUFF ^^ ******************
 
 });
 
-// print last 3 addresses from firebase to html
-database.ref().limitToLast(3).on('child_added', function(childSnapshot) {
-var streetOrigin = childSnapshot.val().streetOrigin;
-	var cityOrigin = childSnapshot.val().cityOrigin;
-	var stateOrigin = childSnapshot.val().stateOrigin;
-	var zipOrigin = childSnapshot.val().zipOrigin;
 
-	var streetDestination = childSnapshot.val().streetDestination;
-	var cityDestination = childSnapshot.val().cityDestination;
-	var stateDestination = childSnapshot.val().stateDestination;
-	var zipDestination = childSnapshot.val().zipDestination;
-
-	var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
-	var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
-	
-	// Add addresses to the respective "Previous ____" div
-	$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this address</a></div></div>");
-	$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this address</a></div></div>");
+$("#resetButton").on("click", function(){
+	document.location.reload(true);
 });
 
-// below commented function for pushing *ALL* firebase addresses to html
-// database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-// 	// prevent default
-// 	//console.log(childSnapshot.val());
-// 	// Store everything into a variable.
-// 	var streetOrigin = childSnapshot.val().streetOrigin;
-// 	var cityOrigin = childSnapshot.val().cityOrigin;
-// 	var stateOrigin = childSnapshot.val().stateOrigin;
-// 	var zipOrigin = childSnapshot.val().zipOrigin;
+// print last 3 addresses from firebase to html upon load
+function printPreviousAddresses () {
+	database.ref().limitToLast(3).on('child_added', function(childSnapshot) {
+		var streetOrigin = childSnapshot.val().streetOrigin;
+		var cityOrigin = childSnapshot.val().cityOrigin;
+		var stateOrigin = childSnapshot.val().stateOrigin;
+		var zipOrigin = childSnapshot.val().zipOrigin;
 
-// 	var streetDestination = childSnapshot.val().streetDestination;
-// 	var cityDestination = childSnapshot.val().cityDestination;
-// 	var stateDestination = childSnapshot.val().stateDestination;
-// 	var zipDestination = childSnapshot.val().zipDestination;
+		var streetDestination = childSnapshot.val().streetDestination;
+		var cityDestination = childSnapshot.val().cityDestination;
+		var stateDestination = childSnapshot.val().stateDestination;
+		var zipDestination = childSnapshot.val().zipDestination;
 
-// 	var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
-// 	var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
-	
-// 	// Add addresses to the respective "Previous ____" div
-// 	$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this address</a></div></div>");
-// 	$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this address</a></div></div>");
+		var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
+		var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
+		
+		// Add addresses to the respective "Previous ____" div
+		$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this origin</a></div></div>");
+		$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this destination</a></div></div>");
+	});
+};
 
-// });
+printPreviousAddresses();
+
+
 
 // 3 functions below get user's location
 var queryURL = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ";
@@ -156,16 +162,16 @@ function showPosition(position) {
 			method:'GET'
 		}).done(function(response) {
 			//console.log(response.results[0].address_components);
-			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].long_name;
+			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
 			//console.log(userCurrentStreet);
 
-			var userCurrentCity = response.results[0].address_components[3].long_name;
+			var userCurrentCity = response.results[0].address_components[4].long_name;
 			//console.log(userCurrentCity);
 
-			var userCurrentState = response.results[0].address_components[5].short_name;
+			var userCurrentState = response.results[0].address_components[6].short_name;
 			//console.log(userCurrentState);
 
-			var userCurrentZIP = response.results[0].address_components[7].long_name;
+			var userCurrentZIP = response.results[0].address_components[8].long_name;
 			//console.log(userCurrentZIP);
 
 			$("#originStreet-input").attr("value", userCurrentStreet);
@@ -177,19 +183,6 @@ function showPosition(position) {
 }
 
 $("#userLocation").on("click", getLocation);
-
-// //BART API
-// var userkeyBart = "MW9S-E7SL-26DU-VV8V";
-
-// var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
-
-// 		$.ajax({
-// 			url: queryURL,
-// 			method: 'GET'
-// 			}).done(function(response){
-// 				//console.log(queryURL);
-
-// 		});
 
 $(document).on("click", ".useThisO", function(event){
   // prevent default
@@ -221,37 +214,5 @@ $(document).on("click", ".useThisD", function(event){
   $("#destinationZIP-input").attr("value", prevZipDestination);
 });
 
-// function to use
-// $("#useThisAddress").on("click", function(){
-// 	// prevent default
-// 	event.preventDefault();
 
-// 	var streetOrigin = $("#originStreet-input").val().trim();
-// 	var cityOrigin = $("#originCity-input").val().trim();
-// 	var stateOrigin = $("#originState-input").val().trim();
-// 	var zipOrigin = $("#originZIP-input").val().trim();
-// 	var streetDestination = $("#destinationState-input").val().trim();
-// 	var cityDestination = $("#destinationCity-input").val().trim();
-// 	var stateDestination = $("#destinationState-input").val().trim();
-// 	var zipDestination = $("#destinationZIP-input").val().trim();
-
-// 	var origin = {
-// 		street: streetOrigin;
-// 		city: cityOrigin;
-// 		state: stateOrigin;
-// 		zip: zipOrigin;
-// 	};
-
-// 	var destination = {
-// 		street: streetDestination;
-// 		city: cityDestination;
-// 		state: stateDestination;
-// 		zip: zipDestination;
-// 	};
-
-//   	database.ref().push(origin);
-//   	database.ref().push(destination);
-
-// });
-
-// </script>
+// bootstrap form fields, get current location city and zip code fixed, made print firebase data dry, fixed issue of adding a 4th destination upon submit click
