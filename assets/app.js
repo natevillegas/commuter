@@ -120,6 +120,30 @@ $("#submitButton").on("click", function(){
 	}
 	//****************** ^^ UBER STUFF ^^ ******************
 
+	$.ajax({
+		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+		method: "GET"
+	}).done(function(response) {
+		console.log(response);
+		var originLat = response.results[0].geometry.location.lat;
+		var originLng = response.results[0].geometry.location.lng;
+		console.log(originLat);
+		console.log(originLng);
+	});	
+
+	$.ajax({
+		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+		method: "GET"
+	}).done(function(response) {
+		console.log(response);
+		var destinationLat = response.results[0].geometry.location.lat;
+		var destinationLng = response.results[0].geometry.location.lng;
+		console.log(destinationLat);
+		console.log(destinationLng);
+	});	
+
 });
 
 
@@ -170,7 +194,7 @@ function showPosition(position) {
 			url:queryURL,
 			method:'GET'
 		}).done(function(response) {
-			//console.log(response.results[0].address_components);
+			console.log(response);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
 			console.log(userCurrentStreet);
 
@@ -190,6 +214,7 @@ function showPosition(position) {
 
 		});
 }
+
 
 $("#userLocation").on("click", getLocation);
 
