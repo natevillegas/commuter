@@ -97,62 +97,73 @@ $("#submitButton").on("click", function(){
 
 
 	// ***THESE ARE TEST VALUES****
-	var userLatitude = 41.7283405
-	  , userLongitude = -72.994567
-	  , partyLatitude = 40.7283405
- 	  , partyLongitude = -73.994567;
+	// var userLatitude = 41.7283405
+	//   , userLongitude = -72.994567
+	//   , partyLatitude = 40.7283405
+ // 	  , partyLongitude = -73.994567;
 
- 	// var uberHighPrice;
- 	// var uberHighDistance;
+	// getEstimatesForUserLocation(userLatitude, userLongitude);
 
-	getEstimatesForUserLocation(userLatitude, userLongitude);
-
-	function comparePrice(x,y){
+	function compareAPIS(x,y){
 		console.log(x + " " + y);
-		$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + x + "</p><p>" + y + "</p>");
 
+
+
+
+		//Comparison logic goes here!!!!!
+
+
+
+
+		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + x + "</h5><h5 class='text-center'>" + y + " min</h5>");
 	}
 
-	//****************** UBER STUFF **********************
-	function getEstimatesForUserLocation(latitude,longitude) {
+	function callAPIS (originLat,originLng,destinationLat,destinationLng) {
+	// use user's origin and destination long/lats
+	//function getEstimatesForUserLocation(latitude,longitude) {
 		$.ajax({
-	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + latitude 
-	    		+ "&start_longitude=" + longitude 
-	    		+ "&end_latitude=" + partyLatitude 
-	    		+ "&end_longitude=" + partyLongitude 
+	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + originLat 
+	    		+ "&start_longitude=" + originLng 
+	    		+ "&end_latitude=" + destinationLat 
+	    		+ "&end_longitude=" + destinationLng 
 	    		+ "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
 			method: "GET"
 		}).done(function(response) {
 			console.log(response);
 			var uberHighPrice = response.prices[0].high_estimate;
 			var uberHighTime  = response.prices[0].duration/60; //converts seconds to minutes
-			comparePrice(uberHighPrice, uberHighTime);
+			compareAPIS(uberHighPrice, uberHighTime);
 		})
 	}
-	//****************** ^^ UBER STUFF ^^ ******************
+
+	var originLat = 0;
+	var originLng = 0;
+
+	// get user's origin and destination long/lats
 	$.ajax({
         //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
         url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
         method: "GET"
     }).done(function(response) {
         console.log(response);
-        var originLat = response.results[0].geometry.location.lat;
-        var originLng = response.results[0].geometry.location.lng;
-        console.log(originLat);
-        console.log(originLng);
-    });    
-
-    $.ajax({
-        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
-        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
-        method: "GET"
-    }).done(function(response) {
-        console.log(response);
-        var destinationLat = response.results[0].geometry.location.lat;
-        var destinationLng = response.results[0].geometry.location.lng;
-        console.log(destinationLat);
-        console.log(destinationLng);
-    });
+        originLat = response.results[0].geometry.location.lat;
+        originLng = response.results[0].geometry.location.lng;
+        // console.log(originLat);
+        // console.log(originLng);
+    }).done(function() {    
+		$.ajax({
+	        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+	        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+	        method: "GET"
+	    }).done(function(response) {
+	        console.log(response);
+	        var destinationLat = response.results[0].geometry.location.lat;
+	        var destinationLng = response.results[0].geometry.location.lng;
+	        // console.log(destinationLat);
+	        // console.log(destinationLng);
+	        callAPIS(originLat,originLng,destinationLat,destinationLng);
+	    });
+	  });
 });
 
 
@@ -162,7 +173,7 @@ $("#resetButton").on("click", function(){
 
 // print last 3 addresses from firebase to html upon load
 function printPreviousAddresses () {
-	database.ref().limitToLast(3).on('child_added', function(childSnapshot) {
+	database.ref().limitToLast(1).on('child_added', function(childSnapshot) {
 		var streetOrigin = childSnapshot.val().streetOrigin;
 		var cityOrigin = childSnapshot.val().cityOrigin;
 		var stateOrigin = childSnapshot.val().stateOrigin;
