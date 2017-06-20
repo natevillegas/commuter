@@ -78,6 +78,13 @@ $("#submitButton").on("click", function(){
 	var cityDestination = $("#destinationCity-input").val().trim();
 	var stateDestination = $("#destinationState-input").val().trim();
 	var zipDestination = $("#destinationZIP-input").val().trim();
+
+	// for (var i = 0; i < streetOrigin.length; i++) {
+	// 	var streetOriginURL = streetOrigin + "+"
+	// 	};
+
+	// 	console.log(streetOriginURL);
+
 	// assign origin address to an "origin" object
 	var navInfo = {
 		streetOrigin: streetOrigin,
@@ -92,9 +99,77 @@ $("#submitButton").on("click", function(){
 	};
 	//push objects to firebase database
   	database.ref().push(navInfo);
-  	
 
-});
+	// XMLrequest error here: "XMLHttpRequest cannot load" 
+
+	var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
+	var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + cityOrigin + "&destination=" + cityDestination + "&mode=transit&key=" + userkeyGoogle;
+
+	console.log(queryURL2);
+
+		$.ajax({
+		url: queryURL2,
+		method: "GET",
+		}).done(function(response){
+
+			console.log(response);
+			console.log(response.routes[0].fare.text);
+			console.log(response.routes[0].legs[0].duration.text);
+			console.log()
+
+			var bartFare = response.routes[0].fare.text;
+			var bartDuration = response.routes[0].legs[0].duration.text;
+
+			// if (bartFare != true) {
+
+			// // 
+			
+			// }
+			
+			// console.log(bartFare);			
+
+			});
+
+// $.ajax({
+//             url: Auto_Complete_Link, 
+//             type: "GET",   
+//             dataType: 'jsonp',
+//             cache: false,
+//             success: function(response){                          
+//                 alert(response);                   
+//             }           
+//         });    
+
+	// end of error
+
+	// var directionsService = new google.maps.DirectionsService();
+	// console.log (directionsService);
+ //        var directionsRequest = {
+ //            origin: "122 Del Alba St., San Pablo, CA 94806",
+ //            destination: "1165 Ridgemont Pl, Concord, CA 94521",
+ //            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+ //            unitSystem: google.maps.UnitSystem.METRIC
+ //        };
+ //        console.log (directionsRequest);
+
+
+ //        directionsService.route(directionsRequest, function (response, status) {
+ //            if (status == google.maps.DirectionsStatus.OK) {                    
+ //            //do work with response data
+ //            }
+ //            else{
+ //                //Error has occured
+ //            }
+        
+ //        })
+
+        // console.log(directionsService.route());
+
+});  	
+
+
+
+
 
 // function for pushing firebase addresses to html
 database.ref().on("child_added", function(childSnapshot, prevChildKey) {
@@ -159,20 +234,24 @@ function showPosition(position) {
 		});
 }
 
-//BART API
-var userkeyBart = "MW9S-E7SL-26DU-VV8V";
+// //BART API
+// var userkeyBart = "MW9S-E7SL-26DU-VV8V";
 
-var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
+// var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
 
-		$.ajax({
-			url: queryURL,
-			method: 'GET'
-			}).done(function(response){
-				console.log(queryURL);
+// 		$.ajax({
+// 			url: queryURL,
+// 			method: 'GET'
+// 			}).done(function(response){
+// 				console.log(queryURL);
 
-		});
+// 		});
 
 $("#userLocation").on("click", getLocation);
+
+
+
+
 
 // function to use
 // $("#useThisAddress").on("click", function(){
