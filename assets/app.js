@@ -92,23 +92,30 @@ $("#submitButton").on("click", function(){
   	printPreviousAddresses();
 
 	//****************** UBER STUFF **********************
-	// // ***THESE ARE TEST VALUES****
-	// var userLatitude = 41.7283405
-	//   , userLongitude = -72.994567
-	//   , partyLatitude = 40.7283405
- 	//   , partyLongitude = -73.994567;
+	// ***THESE ARE TEST VALUES****
+	var userLatitude = 41.7283405
+	  , userLongitude = -72.994567
+	  , partyLatitude = 40.7283405
+ 	  , partyLongitude = -73.994567;
 
-	// getEstimatesForUserLocation(userLatitude, userLongitude);
+	getEstimatesForUserLocation(userLatitude, userLongitude);
 
-	// function getEstimatesForUserLocation(latitude,longitude) {
-	// 	$.ajax({
-	//     	url: "https://api.uber.com/v1/estimates/price?start_latitude=" + latitude + "&start_longitude=" + longitude + "&end_latitude=" + partyLatitude + "&end_longitude=" + partyLongitude + "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
-	// 		method: "GET"
-	// 	}).done(function(response) {
-	// 		console.log(response.prices[0].high_estimate);
-	// 		$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[7].high_estimate + "</p>");
-	// 	});
-	// }
+	function getEstimatesForUserLocation(latitude,longitude) {
+		$.ajax({
+	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + latitude 
+	    		+ "&start_longitude=" + longitude 
+	    		+ "&end_latitude=" + partyLatitude 
+	    		+ "&end_longitude=" + partyLongitude 
+	    		+ "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
+			method: "GET"
+		}).done(function(response) {
+			console.log(response);
+			var uberHighPrice = response.prices[0].high_estimate;
+			var uberHighDistance  = response.prices[0].duration;
+
+			$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[0].high_estimate + "</p>");
+		});
+	}
 	//****************** ^^ UBER STUFF ^^ ******************
 
 });
@@ -163,16 +170,16 @@ function showPosition(position) {
 		}).done(function(response) {
 			//console.log(response.results[0].address_components);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
-			//console.log(userCurrentStreet);
+			console.log(userCurrentStreet);
 
-			var userCurrentCity = response.results[0].address_components[4].long_name;
-			//console.log(userCurrentCity);
+			var userCurrentCity = response.results[0].address_components[3].long_name;
+			console.log(userCurrentCity);
 
 			var userCurrentState = response.results[0].address_components[6].short_name;
-			//console.log(userCurrentState);
+			console.log(userCurrentState);
 
-			var userCurrentZIP = response.results[0].address_components[8].long_name;
-			//console.log(userCurrentZIP);
+			var userCurrentZIP = response.results[0].address_components[7].long_name;
+			console.log(userCurrentZIP);
 
 			$("#originStreet-input").attr("value", userCurrentStreet);
 			$("#originCity-input").attr("value", userCurrentCity);
@@ -213,6 +220,3 @@ $(document).on("click", ".useThisD", function(event){
   $("#destinationState-input").attr("value", prevStateDestination);
   $("#destinationZIP-input").attr("value", prevZipDestination);
 });
-
-
-// bootstrap form fields, get current location city and zip code fixed, made print firebase data dry, fixed issue of adding a 4th destination upon submit click
