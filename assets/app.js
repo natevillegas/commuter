@@ -1,10 +1,5 @@
-//<<<<<<< HEAD
-//Alexis' New Comment (Sat Class)
-
-//=======
 // New comment from Alexis
 // hello hello
-//>>>>>>> 6a3e027b4d642188b2c9994a8201f72bd4671afd
 // Pseudocode
 
 // The user is allowed to input text for Origin Form
@@ -77,7 +72,6 @@ $("#submitButton").on("click", function(){
 	var cityDestination = $("#destinationCity-input").val().trim();
 	var stateDestination = $("#destinationState-input").val().trim();
 	var zipDestination = $("#destinationZIP-input").val().trim();
-
 	// assign origin address to an "origin" object
 	var navInfo = {
 		streetOrigin: streetOrigin,
@@ -99,7 +93,6 @@ $("#submitButton").on("click", function(){
   	// re-print last 3 addresses from firembase to html
   	printPreviousAddresses();
 
-
 	//****************** UBER STUFF **********************
 	// ***THESE ARE TEST VALUES****
 	var userLatitude = 41.7283405
@@ -111,13 +104,6 @@ $("#submitButton").on("click", function(){
 
 	function getEstimatesForUserLocation(latitude,longitude) {
 		$.ajax({
-<<<<<<< HEAD
-	    	url: "https://api.uber.com/v1/estimates/price?start_latitude=" + latitude + "&start_longitude=" + longitude + "&end_latitude=" + partyLatitude + "&end_longitude=" + partyLongitude + "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
-			method: "GET"
-		}).done(function(response) {
-			console.log(response.prices[0].high_estimate);
-			$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[7].high_estimate + "</p>");
-=======
 	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + latitude 
 	    		+ "&start_longitude=" + longitude 
 	    		+ "&end_latitude=" + partyLatitude 
@@ -130,7 +116,6 @@ $("#submitButton").on("click", function(){
 			var uberHighDistance  = response.prices[0].duration;
 
 			$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[0].high_estimate + "</p>");
->>>>>>> refs/remotes/origin/master
 		});
 	}
 	//****************** ^^ UBER STUFF ^^ ******************
