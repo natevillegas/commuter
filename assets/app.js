@@ -199,8 +199,44 @@ $("#submitButton").on("click", function(){
 
 			var googleWalkPrice = 0;
 
+			//$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[0].high_estimate + "</p>");
+			$("#UBERtime").html(uberHighDistance/6000 +" minutes");
 		});
 
+	$.ajax({
+		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+		method: "GET"
+	}).done(function(response) {
+		console.log(response);
+		var originLat = response.results[0].geometry.location.lat;
+		var originLng = response.results[0].geometry.location.lng;
+		console.log(originLat);
+		console.log(originLng);
+	});	
+
+	$.ajax({
+		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+		method: "GET"
+	}).done(function(response) {
+		console.log(response);
+		var destinationLat = response.results[0].geometry.location.lat;
+		var destinationLng = response.results[0].geometry.location.lng;
+		console.log(destinationLat);
+		console.log(destinationLng);
+	})
+
+	$("#UBERit").empty();
+	$("#TRANSITit").empty();
+	$("#WALKit").empty();
+
+
+	$("#UBERit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>UBER</h5></div><div class='panel-body' style='text-align:center' id='UBERtime'></div></div>");
+	$("#TRANSITit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Transit</h5></div><div class='panel-body' style='text-align:center' id='TRANSITtime'>15 minutes</div></div>");
+	$("#WALKit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Walking</h5></div><div class='panel-body' style='text-align:center' id='WALKINGtime'>20 minutes</div></div>");
+	
+});
 	// Google Maps Directions API ends here
 
 	}	
@@ -283,7 +319,7 @@ function showPosition(position) {
 			url:queryURL,
 			method:'GET'
 		}).done(function(response) {
-			//console.log(response.results[0].address_components);
+			console.log(response);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
 			//console.log(userCurrentStreet);
 
@@ -303,6 +339,7 @@ function showPosition(position) {
 
 		});
 }
+
 
 $("#userLocation").on("click", getLocation);
 
