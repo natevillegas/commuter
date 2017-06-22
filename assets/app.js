@@ -72,6 +72,13 @@ $("#submitButton").on("click", function(){
 	var cityDestination = $("#destinationCity-input").val().trim();
 	var stateDestination = $("#destinationState-input").val().trim();
 	var zipDestination = $("#destinationZIP-input").val().trim();
+
+	// for (var i = 0; i < streetOrigin.length; i++) {
+	// 	var streetOriginURL = streetOrigin + "+"
+	// 	};
+
+	// 	console.log(streetOriginURL);
+
 	// assign origin address to an "origin" object
 	var navInfo = {
 		streetOrigin: streetOrigin,
@@ -86,6 +93,11 @@ $("#submitButton").on("click", function(){
 	};
 	// push objects to firebase database
   	database.ref().push(navInfo);
+
+	
+
+  	
+
   	
   	// clear spans and divs
   	$("#prevOrigins").empty();
@@ -94,7 +106,6 @@ $("#submitButton").on("click", function(){
   	$("#fastestOption").empty();
   	// re-print last 3 addresses from firembase to html
   	printPreviousAddresses();
-
 
 	// ***THESE ARE TEST VALUES****
 	// var userLatitude = 41.7283405
@@ -107,13 +118,9 @@ $("#submitButton").on("click", function(){
 	function compareAPIS(x,y){
 		console.log(x + " " + y);
 
-
-
-
 		//Comparison logic goes here!!!!!
 
-
-
+		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + y + " min</h5><h5 class='text-center'>$" + x + " min</h5>");
 
 		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + x + "</h5><h5 class='text-center'>" + y + " min</h5>");
 	}
@@ -134,7 +141,69 @@ $("#submitButton").on("click", function(){
 			var uberHighTime  = response.prices[0].duration/60; //converts seconds to minutes
 			compareAPIS(uberHighPrice, uberHighTime);
 		})
-	}
+
+		// Google Maps Directions API starts here
+
+		var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
+
+		// URL for transit mode
+		var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=transit&key=" + userkeyGoogle;
+		// URL for walking mode
+		var queryURL3 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=walking&key=" + userkeyGoogle;
+
+		console.log(queryURL2);
+
+		// Call for APIL: Google Maps Direction Transit Mode 
+
+		$.ajax({
+		url: queryURL2,
+		method: "GET",
+		}).done(function(response){
+
+			console.log(response);
+						
+			var googleBartTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+			console.log("Transit Duration: " + googleBartTime);
+
+
+			// // Google Maps Fare does not exist sometimes
+
+			// var googleFare;
+
+			// if (response.routes[0].fare.text === false) {
+			// 	googleFare = 0;
+			// } 
+
+			// else {
+			// 	googleFare = response.routes[0].fare.text;
+			// }	
+
+			// console.log(googleFare);
+			
+			});
+
+		console.log(queryURL3);
+
+		// Call for APIL: Google Maps Direction Walking Mode 
+
+		$.ajax({
+		url: queryURL3,
+		method: "GET",
+		}).done(function(response){
+
+			console.log(response);
+						
+			var googleWalkTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+
+			console.log("Walking Duration: " + googleWalkTime);
+
+			var googleWalkPrice = 0;
+
+		});
+
+	// Google Maps Directions API ends here
+
+	}	
 
 	var originLat = 0;
 	var originLng = 0;
@@ -164,8 +233,8 @@ $("#submitButton").on("click", function(){
 	        callAPIS(originLat,originLng,destinationLat,destinationLng);
 	    });
 	  });
-});
 
+});
 
 $("#resetButton").on("click", function(){
 	document.location.reload(true);
@@ -266,3 +335,4 @@ $(document).on("click", ".useThisD", function(event){
 	$("#destinationState-input").attr("value", prevStateDestination);
 	$("#destinationZIP-input").attr("value", prevZipDestination);
 	});
+
