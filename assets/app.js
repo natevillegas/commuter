@@ -1,5 +1,5 @@
-// added comment
-
+// New comment from Alexis
+// hello hello
 // Pseudocode
 
 // The user is allowed to input text for Origin Form
@@ -55,15 +55,9 @@ firebase.initializeApp(config);
 // variable
 var database = firebase.database()
 
-// Commented out these variables since we use them in different ways in the functions below
-// var streetOrigin = "";
-// var cityOrigin = "";
-// var stateOrigin = "";
-// var zipOrigin;
-// var streetDestination = "";
-// var cityDestination = "";
-// var stateDestination = "";
-// var zipDestination;
+// uber keys
+var uberClientId = "W5EjuGPtsBB6ys1CsU4yO_v2v6OD-9yv";
+var uberServerToken = "JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT";
 
 //function for getting user address inputs and storing to firebase
 $("#submitButton").on("click", function(){
@@ -97,15 +91,69 @@ $("#submitButton").on("click", function(){
 		stateDestination: stateDestination,
 		zipDestination: zipDestination,
 	};
-	//push objects to firebase database
+	// push objects to firebase database
   	database.ref().push(navInfo);
 
-	// XMLrequest error here: "XMLHttpRequest cannot load" 
+	
 
-	var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
-	var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + cityOrigin + "&destination=" + cityDestination + "&mode=transit&key=" + userkeyGoogle;
+  	
 
-	console.log(queryURL2);
+  	
+  	// clear spans and divs
+  	$("#prevOrigins").empty();
+  	$("#prevDestinations").empty();
+  	$("#cheapestOption").empty();
+  	$("#fastestOption").empty();
+  	// re-print last 3 addresses from firembase to html
+  	printPreviousAddresses();
+
+	// ***THESE ARE TEST VALUES****
+	// var userLatitude = 41.7283405
+	//   , userLongitude = -72.994567
+	//   , partyLatitude = 40.7283405
+ // 	  , partyLongitude = -73.994567;
+
+	// getEstimatesForUserLocation(userLatitude, userLongitude);
+
+	function compareAPIS(x,y){
+		console.log(x + " " + y);
+
+		//Comparison logic goes here!!!!!
+
+		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + y + " min</h5><h5 class='text-center'>$" + x + " min</h5>");
+
+		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + x + "</h5><h5 class='text-center'>" + y + " min</h5>");
+	}
+
+	function callAPIS (originLat,originLng,destinationLat,destinationLng) {
+	// use user's origin and destination long/lats
+	//function getEstimatesForUserLocation(latitude,longitude) {
+		$.ajax({
+	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + originLat 
+	    		+ "&start_longitude=" + originLng 
+	    		+ "&end_latitude=" + destinationLat 
+	    		+ "&end_longitude=" + destinationLng 
+	    		+ "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
+			method: "GET"
+		}).done(function(response) {
+			console.log(response);
+			var uberHighPrice = response.prices[0].high_estimate;
+			var uberHighTime  = response.prices[0].duration/60; //converts seconds to minutes
+			compareAPIS(uberHighPrice, uberHighTime);
+		})
+
+		// Google Maps Directions API starts here
+
+		var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
+
+		// URL for transit mode
+		var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=transit&key=" + userkeyGoogle;
+		// URL for walking mode
+		var queryURL3 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=walking&key=" + userkeyGoogle;
+
+		console.log(queryURL2);
+
+		// Call for APIL: Google Maps Direction Transit Mode 
 
 		$.ajax({
 		url: queryURL2,
@@ -113,86 +161,110 @@ $("#submitButton").on("click", function(){
 		}).done(function(response){
 
 			console.log(response);
-			console.log(response.routes[0].fare.text);
-			console.log(response.routes[0].legs[0].duration.text);
-			console.log()
+						
+			var googleBartTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+			console.log("Transit Duration: " + googleBartTime);
 
-			var bartFare = response.routes[0].fare.text;
-			var bartDuration = response.routes[0].legs[0].duration.text;
 
-			// if (bartFare != true) {
+			// // Google Maps Fare does not exist sometimes
 
-			// // 
+			// var googleFare;
+
+			// if (response.routes[0].fare.text === false) {
+			// 	googleFare = 0;
+			// } 
+
+			// else {
+			// 	googleFare = response.routes[0].fare.text;
+			// }	
+
+			// console.log(googleFare);
 			
-			// }
-			
-			// console.log(bartFare);			
-
 			});
 
-// $.ajax({
-//             url: Auto_Complete_Link, 
-//             type: "GET",   
-//             dataType: 'jsonp',
-//             cache: false,
-//             success: function(response){                          
-//                 alert(response);                   
-//             }           
-//         });    
+		console.log(queryURL3);
 
-	// end of error
+		// Call for APIL: Google Maps Direction Walking Mode 
 
-	// var directionsService = new google.maps.DirectionsService();
-	// console.log (directionsService);
- //        var directionsRequest = {
- //            origin: "122 Del Alba St., San Pablo, CA 94806",
- //            destination: "1165 Ridgemont Pl, Concord, CA 94521",
- //            travelMode: google.maps.DirectionsTravelMode.DRIVING,
- //            unitSystem: google.maps.UnitSystem.METRIC
- //        };
- //        console.log (directionsRequest);
+		$.ajax({
+		url: queryURL3,
+		method: "GET",
+		}).done(function(response){
 
+			console.log(response);
+						
+			var googleWalkTime = Math.floor(response.routes[0].legs[0].duration.value/60);
 
- //        directionsService.route(directionsRequest, function (response, status) {
- //            if (status == google.maps.DirectionsStatus.OK) {                    
- //            //do work with response data
- //            }
- //            else{
- //                //Error has occured
- //            }
-        
- //        })
+			console.log("Walking Duration: " + googleWalkTime);
 
-        // console.log(directionsService.route());
+			var googleWalkPrice = 0;
 
-});  	
+		});
 
+	// Google Maps Directions API ends here
 
+	}	
 
+	var originLat = 0;
+	var originLng = 0;
 
+	// get user's origin and destination long/lats
+	$.ajax({
+        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+        method: "GET"
+    }).done(function(response) {
+        console.log(response);
+        originLat = response.results[0].geometry.location.lat;
+        originLng = response.results[0].geometry.location.lng;
+        // console.log(originLat);
+        // console.log(originLng);
+    }).done(function() {    
+		$.ajax({
+	        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+	        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+	        method: "GET"
+	    }).done(function(response) {
+	        console.log(response);
+	        var destinationLat = response.results[0].geometry.location.lat;
+	        var destinationLng = response.results[0].geometry.location.lng;
+	        // console.log(destinationLat);
+	        // console.log(destinationLng);
+	        callAPIS(originLat,originLng,destinationLat,destinationLng);
+	    });
+	  });
 
-// function for pushing firebase addresses to html
-database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-	// prevent default
-	console.log(childSnapshot.val());
-	// Store everything into a variable.
-	var streetOrigin = childSnapshot.val().streetOrigin;
-	var cityOrigin = childSnapshot.val().cityOrigin;
-	var stateOrigin = childSnapshot.val().stateOrigin;
-	var zipOrigin = childSnapshot.val().zipOrigin;
-
-	var streetDestination = childSnapshot.val().streetDestination;
-	var cityDestination = childSnapshot.val().cityDestination;
-	var stateDestination = childSnapshot.val().stateDestination;
-	var zipDestination = childSnapshot.val().zipDestination;
-
-	var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
-	var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
-	
-	// Add addresses to the respective "Previous ____" div
-	$("#prevOrigins").append("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"</div></div>");
-	$("#prevDestinations").append("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"</div></div>");
 });
+
+$("#resetButton").on("click", function(){
+	document.location.reload(true);
+});
+
+// print last 3 addresses from firebase to html upon load
+function printPreviousAddresses () {
+	database.ref().limitToLast(1).on('child_added', function(childSnapshot) {
+		var streetOrigin = childSnapshot.val().streetOrigin;
+		var cityOrigin = childSnapshot.val().cityOrigin;
+		var stateOrigin = childSnapshot.val().stateOrigin;
+		var zipOrigin = childSnapshot.val().zipOrigin;
+
+		var streetDestination = childSnapshot.val().streetDestination;
+		var cityDestination = childSnapshot.val().cityDestination;
+		var stateDestination = childSnapshot.val().stateDestination;
+		var zipDestination = childSnapshot.val().zipDestination;
+
+		var neatOrigin = streetOrigin + ", " + cityOrigin + ", " + stateOrigin + ", " + zipOrigin;
+		var neatDestination = streetDestination + ", " + cityDestination + ", " + stateDestination + ", " + zipDestination;
+		
+		// Add addresses to the respective "Previous ____" div
+		$("#prevOrigins").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatOrigin+"<br><a href='#' class='useThisO' street='" + streetOrigin + "' city='" + cityOrigin + "' state='" + stateOrigin + "' zip='" + zipOrigin + "'>Use this origin</a></div></div>");
+		$("#prevDestinations").prepend("<div class='panel panel-default'><div class='panel-body'>"+neatDestination+"<br><a href='#' class='useThisD' street='" + streetDestination + "' city='" + cityDestination + "' state='" + stateDestination + "' zip='" + zipDestination + "'>Use this destination</a></div></div>");
+	});
+};
+
+printPreviousAddresses();
+
+
 
 // 3 functions below get user's location
 var queryURL = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ";
@@ -211,79 +283,56 @@ function showPosition(position) {
 			url:queryURL,
 			method:'GET'
 		}).done(function(response) {
-			console.log(response.results[0].address_components);
-			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].long_name;
-			console.log(userCurrentStreet);
+			//console.log(response.results[0].address_components);
+			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
+			//console.log(userCurrentStreet);
 
 			var userCurrentCity = response.results[0].address_components[3].long_name;
-			console.log(userCurrentCity);
+			//console.log(userCurrentCity);
 
-			var userCurrentState = response.results[0].address_components[5].short_name;
-			console.log(userCurrentState);
+			var userCurrentState = response.results[0].address_components[6].short_name;
+			//console.log(userCurrentState);
 
 			var userCurrentZIP = response.results[0].address_components[7].long_name;
-			console.log(userCurrentZIP);
+			//console.log(userCurrentZIP);
 
 			$("#originStreet-input").attr("value", userCurrentStreet);
 			$("#originCity-input").attr("value", userCurrentCity);
 			$("#originState-input").attr("value", userCurrentState);
 			$("#originZIP-input").attr("value", userCurrentZIP);
 
-
-
 		});
 }
 
-// //BART API
-// var userkeyBart = "MW9S-E7SL-26DU-VV8V";
-
-// var queryURL = "http://api.bart.gov/api/sched.aspx?cmd=routesched&route=6&key=" + userkeyBart + "&date=sa&json=y";
-
-// 		$.ajax({
-// 			url: queryURL,
-// 			method: 'GET'
-// 			}).done(function(response){
-// 				console.log(queryURL);
-
-// 		});
-
 $("#userLocation").on("click", getLocation);
 
+$(document).on("click", ".useThisO", function(event){
+	// prevent default
+	event.preventDefault();
+	var prevStreetOrigin = $(this).attr("street");
+	var prevCityOrigin = $(this).attr("city");
+	var prevStateOrigin = $(this).attr("state");
+	var prevZipOrigin = $(this).attr("zip");
+	//console.log(prevStreetOrigin);
 
+	$("#originStreet-input").attr("value", prevStreetOrigin);
+	$("#originCity-input").attr("value", prevCityOrigin);
+	$("#originState-input").attr("value", prevStateOrigin);
+	$("#originZIP-input").attr("value", prevZipOrigin);
+});
 
+$(document).on("click", ".useThisD", function(event){
+	// prevent default
+	event.preventDefault();
+	var prevStreetDestination = $(this).attr("street");
+	var prevCityDestination = $(this).attr("city");
+	var prevStateDestination = $(this).attr("state");
+	var prevZipDestination = $(this).attr("zip");
+	//console.log(prevStreetOrigin);
 
+	$("#destinationStreet-input").attr("value", prevStreetDestination);
+	$("#destinationCity-input").attr("value", prevCityDestination);
+	$("#destinationState-input").attr("value", prevStateDestination);
+	$("#destinationZIP-input").attr("value", prevZipDestination);
+	});
 
-// function to use
-// $("#useThisAddress").on("click", function(){
-// 	// prevent default
-// 	event.preventDefault();
-
-// 	var streetOrigin = $("#originStreet-input").val().trim();
-// 	var cityOrigin = $("#originCity-input").val().trim();
-// 	var stateOrigin = $("#originState-input").val().trim();
-// 	var zipOrigin = $("#originZIP-input").val().trim();
-// 	var streetDestination = $("#destinationState-input").val().trim();
-// 	var cityDestination = $("#destinationCity-input").val().trim();
-// 	var stateDestination = $("#destinationState-input").val().trim();
-// 	var zipDestination = $("#destinationZIP-input").val().trim();
-
-// 	var origin = {
-// 		street: streetOrigin;
-// 		city: cityOrigin;
-// 		state: stateOrigin;
-// 		zip: zipOrigin;
-// 	};
-
-// 	var destination = {
-// 		street: streetDestination;
-// 		city: cityDestination;
-// 		state: stateDestination;
-// 		zip: zipDestination;
-// 	};
-
-//   	database.ref().push(origin);
-//   	database.ref().push(destination);
-
-// });
-
-// </script>

@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<title>Comm&uuml;ter</title>
 
-	
+	<style type="text/css" src="assets/style.css"></style>
 	<!--Call to jQuery-->
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 
@@ -35,8 +35,7 @@
 	<div class="container">
 		
 		<!--Figure out how to show current user on top-right of page-->
-		<div align="right" id="userID">Signed in as: Placeholder
-		</div>
+		<div align="right" id="userID"></div>
 		
 		<!--Page Header Div-->
 		<div class="jumbotron" id="page-header">
@@ -50,16 +49,22 @@
 					<div class="panel-heading"><h5>Origin</h5></div><br>
 					
 					<div class="panel-body">
-						<div class="input-group">
-							<input id="originStreet-input" type="text" placeholder="Street Address"><br>
-							<input id="originCity-input" type="text" placeholder="City">
-							<input id="originState-input" type="text" placeholder="State">
-							<input id="originZIP-input" type="text" placeholder="ZIP Code">
+						<div class="form-group">
+							<input class="form-control" id="originStreet-input" type="text" placeholder="Street Address">
+							<div class="col-sm-7" style="padding:0px;">
+								<input class="form-control" id="originCity-input" type="text" placeholder="City">
+							</div>
+							<div class="col-sm-2" style="padding:0px;">
+								<input class="form-control" id="originState-input" type="text" placeholder="State">
+							</div>
+							<div class="col-sm-3" style="padding:0px;">
+								<input class="form-control" id="originZIP-input" type="text" placeholder="ZIP Code">
+							</div>
 						</div>
-						<br>
-						<br>
-
 					<!--Figure out how clicking the link will take in the User's location and put fill in the origin field-->
+					<br>
+					<br>
+					<br>
 					<a href="#" id="userLocation">Use Current Location</a>
 					</div>
 				</div>
@@ -70,37 +75,36 @@
 					<div class="panel-heading"><h5>Destination</h5></div><br>
 					
 					<div class="panel-body">
-						<div class="input-group">
-							<input id="destinationStreet-input" type="text" placeholder="Street Address"><br>
-							<input id="destinationCity-input" type="text" placeholder="City">
-							<input id="destinationState-input" type="text" placeholder="State">
-							<input id="destinationZIP-input" type="text" placeholder="ZIP Code">
+						<div class="form-group">
+							<input class="form-control" id="destinationStreet-input" type="text" placeholder="Street Address">
+							<div class="col-sm-7" style="padding:0px;">
+								<input class="form-control" id="destinationCity-input" type="text" placeholder="City">
+							</div>
+							<div class="col-sm-2" style="padding:0px;">
+								<input class="form-control" id="destinationState-input" type="text" placeholder="State">
+							</div>
+							<div class="col-sm-3" style="padding:0px;">
+								<input class="form-control" id="destinationZIP-input" type="text" placeholder="ZIP Code">
+							</div>
 						</div>
 					
 						<br>
+						<br>
 						<!--Give button functionality to push all input values onto Firebase, hide prevOrigins & prevDestinations, 
 						and show fastestOption & cheapestOption-->
-						<button class="btn btn-default" type="submit" id="submitButton">Submit</button>
+						<div class="text-center">
+							<button class="btn btn-default btn-success" type="submit" id="submitButton">Find Estimates</button>
+							<button class="btn btn-default" id="resetButton">Reset</button>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		
-		<!--Hidden until Submit is clicked-->
-		<div class="row">
-			<div class="col-md-6" id="prevOrigins">
-				<h5>Previous Origins</h5><br>
-			</div>
 
-			<div class="col-md-6" id="prevDestinations">
-				<h5>Previous Destinations</h5><br>
-			</div>
-		</div>
-		
-		<!--Append to fastestOption and cheapestOption
-			"Uber" or "BART"
-			The Time for the Trip and the Price for Each
-			The Option to open the appropriate Uber, BART, or Maps app-->
+		<!--Append to fastestOption and cheapestOption 
+		"Uber" or "BART"
+		The Time for the Trip and the Price for Each
+		The Option to open the appropriate Uber, BART, or Maps app-->
 		<div class="row">
 			<div class="col-md-6">
 				<div id="fastestOption">
@@ -112,6 +116,21 @@
 				</div>
 			</div>
 		</div>
+		
+		<!--Hidden until Submit is clicked-->
+		<div class="row">
+			<div class="col-md-6">
+				<h5>Previous Origin</h5><br>
+				<span id="prevOrigins"></span>
+			</div>
+
+			<div class="col-md-6">
+				<h5>Previous Destination</h5><br>
+				<span id="prevDestinations"></span>
+			</div>
+		</div>
+		
+
 	</div>
 
   <!-- JavaScript -->
