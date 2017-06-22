@@ -142,7 +142,11 @@ $("#submitButton").on("click", function(){
 		var destinationLng = response.results[0].geometry.location.lng;
 		console.log(destinationLat);
 		console.log(destinationLng);
-	});	
+	}).done(function(response) {
+		$("#UBERit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>UBER</h5></div><div class='panel-body' style='text-align:center'>10 minutes</div></div>");
+    	$("#TRANSITit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Transit</h5></div><div class='panel-body' style='text-align:center'>15 minutes</div></div>");
+    	$("#WALKit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Walking</h5></div><div class='panel-body' style='text-align:center'>20 minutes</div></div>");
+	});
 
 });
 
