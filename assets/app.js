@@ -72,6 +72,13 @@ $("#submitButton").on("click", function(){
 	var cityDestination = $("#destinationCity-input").val().trim();
 	var stateDestination = $("#destinationState-input").val().trim();
 	var zipDestination = $("#destinationZIP-input").val().trim();
+
+	// for (var i = 0; i < streetOrigin.length; i++) {
+	// 	var streetOriginURL = streetOrigin + "+"
+	// 	};
+
+	// 	console.log(streetOriginURL);
+
 	// assign origin address to an "origin" object
 	var navInfo = {
 		streetOrigin: streetOrigin,
@@ -86,40 +93,115 @@ $("#submitButton").on("click", function(){
 	};
 	// push objects to firebase database
   	database.ref().push(navInfo);
+
+	
+
   	
-  	// clear span
+
+  	
+  	// clear spans and divs
   	$("#prevOrigins").empty();
   	$("#prevDestinations").empty();
+  	$("#cheapestOption").empty();
+  	$("#fastestOption").empty();
   	// re-print last 3 addresses from firembase to html
   	printPreviousAddresses();
 
-	//****************** UBER STUFF **********************
 	// ***THESE ARE TEST VALUES****
-	var userLatitude = 41.7283405
-	  , userLongitude = -72.994567
-	  , partyLatitude = 40.7283405
- 	  , partyLongitude = -73.994567;
+	// var userLatitude = 41.7283405
+	//   , userLongitude = -72.994567
+	//   , partyLatitude = 40.7283405
+ // 	  , partyLongitude = -73.994567;
 
-	getEstimatesForUserLocation(userLatitude, userLongitude);
+	// getEstimatesForUserLocation(userLatitude, userLongitude);
 
-	function getEstimatesForUserLocation(latitude,longitude) {
+	function compareAPIS(x,y){
+		console.log(x + " " + y);
+
+		//Comparison logic goes here!!!!!
+
+		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + y + " min</h5><h5 class='text-center'>$" + x + " min</h5>");
+
+		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + x + "</h5><h5 class='text-center'>" + y + " min</h5>");
+	}
+
+	function callAPIS (originLat,originLng,destinationLat,destinationLng) {
+	// use user's origin and destination long/lats
+	//function getEstimatesForUserLocation(latitude,longitude) {
 		$.ajax({
-	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + latitude 
-	    		+ "&start_longitude=" + longitude 
-	    		+ "&end_latitude=" + partyLatitude 
-	    		+ "&end_longitude=" + partyLongitude 
+	    	url: "https://crossorigin.me/https://api.uber.com/v1/estimates/price?start_latitude=" + originLat 
+	    		+ "&start_longitude=" + originLng 
+	    		+ "&end_latitude=" + destinationLat 
+	    		+ "&end_longitude=" + destinationLng 
 	    		+ "&server_token=JAKbUCfFFRjLRY9zixZ7ddtnvEKJ333beHINWKfT",
 			method: "GET"
 		}).done(function(response) {
 			console.log(response);
 			var uberHighPrice = response.prices[0].high_estimate;
-			var uberHighDistance  = response.prices[0].duration;
+			var uberHighTime  = response.prices[0].duration/60; //converts seconds to minutes
+			compareAPIS(uberHighPrice, uberHighTime);
+		})
+
+		// Google Maps Directions API starts here
+
+		var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
+
+		// URL for transit mode
+		var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=transit&key=" + userkeyGoogle;
+		// URL for walking mode
+		var queryURL3 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=walking&key=" + userkeyGoogle;
+
+		console.log(queryURL2);
+
+		// Call for APIL: Google Maps Direction Transit Mode 
+
+		$.ajax({
+		url: queryURL2,
+		method: "GET",
+		}).done(function(response){
+
+			console.log(response);
+						
+			var googleBartTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+			console.log("Transit Duration: " + googleBartTime);
+
+
+			// // Google Maps Fare does not exist sometimes
+
+			// var googleFare;
+
+			// if (response.routes[0].fare.text === false) {
+			// 	googleFare = 0;
+			// } 
+
+			// else {
+			// 	googleFare = response.routes[0].fare.text;
+			// }	
+
+			// console.log(googleFare);
+			
+			});
+
+		console.log(queryURL3);
+
+		// Call for APIL: Google Maps Direction Walking Mode 
+
+		$.ajax({
+		url: queryURL3,
+		method: "GET",
+		}).done(function(response){
+
+			console.log(response);
+						
+			var googleWalkTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+
+			console.log("Walking Duration: " + googleWalkTime);
+
+			var googleWalkPrice = 0;
 
 			//$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[0].high_estimate + "</p>");
 			$("#UBERtime").html(uberHighDistance/6000 +" minutes");
 		});
-	}
-	//****************** ^^ UBER STUFF ^^ ******************
 
 	$.ajax({
 		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
@@ -155,7 +237,40 @@ $("#submitButton").on("click", function(){
 	$("#WALKit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Walking</h5></div><div class='panel-body' style='text-align:center' id='WALKINGtime'>20 minutes</div></div>");
 	
 });
+	// Google Maps Directions API ends here
 
+	}	
+
+	var originLat = 0;
+	var originLng = 0;
+
+	// get user's origin and destination long/lats
+	$.ajax({
+        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+        method: "GET"
+    }).done(function(response) {
+        console.log(response);
+        originLat = response.results[0].geometry.location.lat;
+        originLng = response.results[0].geometry.location.lng;
+        // console.log(originLat);
+        // console.log(originLng);
+    }).done(function() {    
+		$.ajax({
+	        //url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
+	        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
+	        method: "GET"
+	    }).done(function(response) {
+	        console.log(response);
+	        var destinationLat = response.results[0].geometry.location.lat;
+	        var destinationLng = response.results[0].geometry.location.lng;
+	        // console.log(destinationLat);
+	        // console.log(destinationLng);
+	        callAPIS(originLat,originLng,destinationLat,destinationLng);
+	    });
+	  });
+
+});
 
 $("#resetButton").on("click", function(){
 	document.location.reload(true);
@@ -163,7 +278,7 @@ $("#resetButton").on("click", function(){
 
 // print last 3 addresses from firebase to html upon load
 function printPreviousAddresses () {
-	database.ref().limitToLast(3).on('child_added', function(childSnapshot) {
+	database.ref().limitToLast(1).on('child_added', function(childSnapshot) {
 		var streetOrigin = childSnapshot.val().streetOrigin;
 		var cityOrigin = childSnapshot.val().cityOrigin;
 		var stateOrigin = childSnapshot.val().stateOrigin;
@@ -206,16 +321,16 @@ function showPosition(position) {
 		}).done(function(response) {
 			console.log(response);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
-			console.log(userCurrentStreet);
+			//console.log(userCurrentStreet);
 
 			var userCurrentCity = response.results[0].address_components[3].long_name;
-			console.log(userCurrentCity);
+			//console.log(userCurrentCity);
 
 			var userCurrentState = response.results[0].address_components[6].short_name;
-			console.log(userCurrentState);
+			//console.log(userCurrentState);
 
 			var userCurrentZIP = response.results[0].address_components[7].long_name;
-			console.log(userCurrentZIP);
+			//console.log(userCurrentZIP);
 
 			$("#originStreet-input").attr("value", userCurrentStreet);
 			$("#originCity-input").attr("value", userCurrentCity);
@@ -229,31 +344,32 @@ function showPosition(position) {
 $("#userLocation").on("click", getLocation);
 
 $(document).on("click", ".useThisO", function(event){
-  // prevent default
-  event.preventDefault();
-  var prevStreetOrigin = $(this).attr("street");
-  var prevCityOrigin = $(this).attr("city");
-  var prevStateOrigin = $(this).attr("state");
-  var prevZipOrigin = $(this).attr("zip");
-  //console.log(prevStreetOrigin);
+	// prevent default
+	event.preventDefault();
+	var prevStreetOrigin = $(this).attr("street");
+	var prevCityOrigin = $(this).attr("city");
+	var prevStateOrigin = $(this).attr("state");
+	var prevZipOrigin = $(this).attr("zip");
+	//console.log(prevStreetOrigin);
 
-  $("#originStreet-input").attr("value", prevStreetOrigin);
-  $("#originCity-input").attr("value", prevCityOrigin);
-  $("#originState-input").attr("value", prevStateOrigin);
-  $("#originZIP-input").attr("value", prevZipOrigin);
+	$("#originStreet-input").attr("value", prevStreetOrigin);
+	$("#originCity-input").attr("value", prevCityOrigin);
+	$("#originState-input").attr("value", prevStateOrigin);
+	$("#originZIP-input").attr("value", prevZipOrigin);
 });
 
 $(document).on("click", ".useThisD", function(event){
-  // prevent default
-  event.preventDefault();
-  var prevStreetDestination = $(this).attr("street");
-  var prevCityDestination = $(this).attr("city");
-  var prevStateDestination = $(this).attr("state");
-  var prevZipDestination = $(this).attr("zip");
-  //console.log(prevStreetOrigin);
+	// prevent default
+	event.preventDefault();
+	var prevStreetDestination = $(this).attr("street");
+	var prevCityDestination = $(this).attr("city");
+	var prevStateDestination = $(this).attr("state");
+	var prevZipDestination = $(this).attr("zip");
+	//console.log(prevStreetOrigin);
 
-  $("#destinationStreet-input").attr("value", prevStreetDestination);
-  $("#destinationCity-input").attr("value", prevCityDestination);
-  $("#destinationState-input").attr("value", prevStateDestination);
-  $("#destinationZIP-input").attr("value", prevZipDestination);
-});
+	$("#destinationStreet-input").attr("value", prevStreetDestination);
+	$("#destinationCity-input").attr("value", prevCityDestination);
+	$("#destinationState-input").attr("value", prevStateDestination);
+	$("#destinationZIP-input").attr("value", prevZipDestination);
+	});
+

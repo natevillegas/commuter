@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<title>Comm&uuml;ter</title>
 
-	
+	<style type="text/css" src="assets/style.css"></style>
 	<!--Call to jQuery-->
 	<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 
@@ -21,11 +21,21 @@
 	<!--Call to googlemaps api-->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ" async defer></script>
 
+	<!-- Call to googlemaps direction -->
+	<!-- <script src="http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCzMS8vMNWdsk52tTMh1n8ZOp_3wSJqOPQ"></script> -->
+	
+	<!-- <script src="https://maps.googleapis.com/maps/api/service/json?key=AIzaSyCzMS8vMNWdsk52tTMh1n8ZOp_3wSJqOPQ"></script> -->
+
+	<script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+	
 </head>
 
 <body>
 	<!--Wrap Page in Container to create equal margins-->
 	<div class="container">
+		
+		<!--Figure out how to show current user on top-right of page-->
+		<div align="right" id="userID"></div>
 		
 		<!--Page Header Div-->
 		<div class="jumbotron" id="page-header">
@@ -118,12 +128,12 @@
 		
 		<div class="row">
 			<div class="col-md-6">
-				<h5>Previous Origins</h5><br>
+				<h5>Previous Origin</h5><br>
 				<span id="prevOrigins"></span>
 			</div>
 
 			<div class="col-md-6">
-				<h5>Previous Destinations</h5><br>
+				<h5>Previous Destination</h5><br>
 				<span id="prevDestinations"></span>
 			</div>
 		</div>
