@@ -115,17 +115,78 @@ $("#submitButton").on("click", function(){
 
 	// getEstimatesForUserLocation(userLatitude, userLongitude);
 
-	function compareAPIS(x,y){
-		console.log(x + " " + y);
+// start of compare function	
+
+	function compareTime(x,y,z,a,b,c){
+		console.log(x + "," + y + "," + z);
+
+		var fastestDisplay;
+		var cheapestDisplay;
+
+		if (x < y) {
+			if (x < z) {
+				fastestDisplay = x + " min (Uber)";
+			} else if (z < x) {
+				fastestDisplay = z + " min (Google Walk)";
+			}
+		}
+
+		if (y < x) {
+			if (y < z) {
+				fastestDisplay = y + " min (Google Transit)" ;
+			} else if (z < y) {
+				fastestDisplay = z + " min (Google Walk)";
+			}
+		}
+
+		if (z < x) {
+			if (z < y) {
+				fastestDisplay = z + " min (Google Walk)";
+			} else if (y < z) {
+				fastestDisplay = y + " min (Google Transit)";
+			}
+		}
+
+		if (a < b) {
+			if (a < c) {
+				cheapestDisplay = a + " (Uber)";
+			} else if (c < a) {
+				cheapestDisplay = c + " (Google Walk)";
+			}
+		}
+
+		if (b < a) {
+			if (b < c) {
+				cheapestDisplay = b + " (Google Transit)";
+			} else if (c < b) {
+				cheapestDisplay = c + " (Google Walk)";
+			}
+		}
+
+		if (c < a) {
+			if (c < b) {
+				cheapestDisplay = c + " (Google Walk)";
+			} else if (b < c) {
+				cheapestDisplay = b + " (Google Transit)";
+			}
+		}
 
 		//Comparison logic goes here!!!!!
 
-		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + y + " min</h5><h5 class='text-center'>$" + x + " min</h5>");
+		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + fastestDisplay + "</h5>");
 
-		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + x + "</h5><h5 class='text-center'>" + y + " min</h5>");
+		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + cheapestDisplay + "</h5>");
+
 	}
 
+// end of compare function
+
+		
+	
+// start of call API function .done fixed
+
 	function callAPIS (originLat,originLng,destinationLat,destinationLng) {
+	
 	// use user's origin and destination long/lats
 	//function getEstimatesForUserLocation(latitude,longitude) {
 		$.ajax({
@@ -139,107 +200,73 @@ $("#submitButton").on("click", function(){
 			console.log(response);
 			var uberHighPrice = response.prices[0].high_estimate;
 			var uberHighTime  = response.prices[0].duration/60; //converts seconds to minutes
-			compareAPIS(uberHighPrice, uberHighTime);
-		})
+			console.log("here " + uberHighTime);
+			// compareAPIS(uberHighTime, googleBartTime, googleWalkTime);
+				// Google Maps Directions API starts here
 
-		// Google Maps Directions API starts here
+					var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
 
-		var userkeyGoogle = "AIzaSyCyxHsJw8QJ4Fh1yE0w-gJY0K27lSuOurc";
+					// URL for transit mode
+					var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=transit&key=" + userkeyGoogle;
+					// URL for walking mode
+					var queryURL3 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=walking&key=" + userkeyGoogle;
 
-		// URL for transit mode
-		var queryURL2 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=transit&key=" + userkeyGoogle;
-		// URL for walking mode
-		var queryURL3 ="https://crossorigin.me/https://maps.googleapis.com/maps/api/directions/json?origin=" + originLat + "," + originLng + "&destination=" + destinationLat + "," + destinationLng + "&mode=walking&key=" + userkeyGoogle;
+					console.log(queryURL2);
 
-		console.log(queryURL2);
+					// Call for APIL: Google Maps Direction Transit Mode 
 
-		// Call for APIL: Google Maps Direction Transit Mode 
+					$.ajax({
+					url: queryURL2,
+					method: "GET",
+					}).done(function(response){
 
-		$.ajax({
-		url: queryURL2,
-		method: "GET",
-		}).done(function(response){
+						console.log(response);
+									
+						googleBartTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+						console.log("Transit Duration: " + googleBartTime);
 
-			console.log(response);
+
+						var googleFare;
 						
-			var googleBartTime = Math.floor(response.routes[0].legs[0].duration.value/60);
-			console.log("Transit Duration: " + googleBartTime);
+						if (response.routes[0].fare) {
+							googleFare = response.routes[0].fare.value;
+						} else {
+							googleFare = 8;
+						}	
 
+						console.log("google fare " + googleFare);
+								
+								// Call for APIL: Google Maps Direction Walking Mode 
 
-			// // Google Maps Fare does not exist sometimes
+								$.ajax({
+								url: queryURL3,
+								method: "GET",
+								}).done(function(response){
 
-			// var googleFare;
+									console.log(response);
+												
+									googleWalkTime = Math.floor(response.routes[0].legs[0].duration.value/60);
 
-			// if (response.routes[0].fare.text === false) {
-			// 	googleFare = 0;
-			// } 
+									console.log("Walking Duration: " + googleWalkTime);
 
-			// else {
-			// 	googleFare = response.routes[0].fare.text;
-			// }	
+									googleWalkPrice = 0;
 
-			// console.log(googleFare);
-			
-			});
+										// Google Maps Directions API ends here
 
-		console.log(queryURL3);
+									console.log("compareTime : " + uberHighTime, googleBartTime, googleWalkTime);
 
-		// Call for APIL: Google Maps Direction Walking Mode 
+									compareTime(uberHighTime, googleBartTime, googleWalkTime, uberHighTime, googleFare, googleWalkPrice);
 
-		$.ajax({
-		url: queryURL3,
-		method: "GET",
-		}).done(function(response){
+								});						
+				});
 
-			console.log(response);
-						
-			var googleWalkTime = Math.floor(response.routes[0].legs[0].duration.value/60);
+					console.log(queryURL3);
 
-			console.log("Walking Duration: " + googleWalkTime);
-
-			var googleWalkPrice = 0;
-
-			//$("#cheapestOption").append("<h4>Cheapest Options</h4><p>" + response.prices[0].high_estimate + "</p>");
-			$("#UBERtime").html(uberHighDistance/6000 +" minutes");
 		});
 
-	$.ajax({
-		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
-		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetOrigin+","+cityOrigin+","+stateOrigin+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
-		method: "GET"
-	}).done(function(response) {
-		console.log(response);
-		var originLat = response.results[0].geometry.location.lat;
-		var originLng = response.results[0].geometry.location.lng;
-		console.log(originLat);
-		console.log(originLng);
-	});	
-
-	$.ajax({
-		//url: "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ"
-		url: "https://maps.googleapis.com/maps/api/geocode/json?address="+streetDestination+","+cityDestination+","+stateDestination+"&key=AIzaSyAPcxvzzVjsR9zzeLUTBhV87D-a9OER6HQ",
-		method: "GET"
-	}).done(function(response) {
-		console.log(response);
-		var destinationLat = response.results[0].geometry.location.lat;
-		var destinationLng = response.results[0].geometry.location.lng;
-		console.log(destinationLat);
-		console.log(destinationLng);
-	})
-
-	$("#UBERit").empty();
-	$("#TRANSITit").empty();
-	$("#WALKit").empty();
-
-
-	$("#UBERit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>UBER</h5></div><div class='panel-body' style='text-align:center' id='UBERtime'></div></div>");
-	$("#TRANSITit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Transit</h5></div><div class='panel-body' style='text-align:center' id='TRANSITtime'>15 minutes</div></div>");
-	$("#WALKit").append("<div class='panel panel-default'><div class='panel-heading' style='text-align:center'><h5>Walking</h5></div><div class='panel-body' style='text-align:center' id='WALKINGtime'>20 minutes</div></div>");
-	
-});
-	// Google Maps Directions API ends here
-
 	}	
+
+// end of call API function .done fixed
 
 	var originLat = 0;
 	var originLng = 0;
@@ -319,7 +346,7 @@ function showPosition(position) {
 			url:queryURL,
 			method:'GET'
 		}).done(function(response) {
-			console.log(response);
+			//console.log(response.results[0].address_components);
 			var userCurrentStreet = response.results[0].address_components[0].long_name + " " + response.results[0].address_components[1].short_name;
 			//console.log(userCurrentStreet);
 
@@ -339,7 +366,6 @@ function showPosition(position) {
 
 		});
 }
-
 
 $("#userLocation").on("click", getLocation);
 
@@ -372,4 +398,3 @@ $(document).on("click", ".useThisD", function(event){
 	$("#destinationState-input").attr("value", prevStateDestination);
 	$("#destinationZIP-input").attr("value", prevZipDestination);
 	});
-
