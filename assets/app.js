@@ -89,6 +89,11 @@ $("#submitButton").on("click", function(){
 	};
 	// push objects to firebase database
   	database.ref().push(navInfo);
+
+	
+
+  	
+
   	
   	// clear spans and divs
   	$("#prevOrigins").empty();
