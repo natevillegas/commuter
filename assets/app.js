@@ -1,7 +1,3 @@
-// New comment from Alexis
-// hello hello
-// Pseudocode
-
 // The user is allowed to input text for Origin Form
 
 	// Street Address
@@ -93,11 +89,6 @@ $("#submitButton").on("click", function(){
 	};
 	// push objects to firebase database
   	database.ref().push(navInfo);
-
-	
-
-  	
-
   	
   	// clear spans and divs
   	$("#prevOrigins").empty();
