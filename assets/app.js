@@ -169,9 +169,9 @@ $("#submitButton").on("click", function(){
 
 		//Comparison logic goes here!!!!!
 
-		$("#fastestOption").append("<h4>Fastest Options</h4><h5 class='text-center' style='color:green'>" + fastestDisplay + "</h5>");
+		$("#fastestOption").append("<h4>Fastest Option</h4><h5 class='text-center' style='color:green'>" + fastestDisplay + "</h5>");
 
-		$("#cheapestOption").append("<h4>Cheapest Options</h4><h5 class='text-center' style='color:green'>$" + cheapestDisplay + "</h5>");
+		$("#cheapestOption").append("<h4>Cheapest Option</h4><h5 class='text-center' style='color:green'>$" + cheapestDisplay + "</h5>");
 
 	}
 
